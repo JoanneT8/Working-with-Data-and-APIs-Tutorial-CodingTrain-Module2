@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+ <html lang="en" class="no-js"> 
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Data Selfie App</title>
+        <meta name="description" content="">
+        <!--<meta name="viewport" content="width=device-width, initial-scale=1">-->
+
+        <!--Responsive meta tag for Bootstrap- mobile first-->
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <!--Bootstrap CSS-->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+        <!--importing leaflet.js API-->
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+        integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+        crossorigin=""/>
+        <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+        integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+        crossorigin=""></script>
+
+    </head>
+    <body>
+
+      <div class="row">
+         <div class="col-md-2">.col-md-2</div>
+
+
+         <!--Middle coloumn of website, using a 2,8,2 bootstrap grid layout-->
+         <div class="col-md-8">
+            <h1>Data Selfie App</h1>
+            <p>Hello there, welcome to my basic website; using Express to create a web server using node.js - the web server's sole job is to SERVE STATIC CONTENT :)</p>
+            
+            <a href="details.html" target="_self">View Project Details</a>
+
+
+            <h2>Location</h2>
+            <p>
+               Longitude: <span id="lat"></span>&deg;
+               <br> 
+               Latitude: <span id="lon"></span>&deg;
+               <br>
+              
+            </p>
+
+             <h2>Photo Submission</h2>
+            <p>Please provide a short desrciption or title that you are submiiting into the database</p>
+            <!--Adding a textfield for user to insert description of the photo they're submitting to the database-->
+            <div class="mb-3">
+               <label for="exampleFormControlInput1" class="form-label">Photo Description</label>
+               <input type="text" class="form-control" id="photoDescription" placeholder="Type here">
+            </div>
+
+            <input id ="submitLocation" class="btn btn-primary" type="submit" value="Submit Location to Database">
+            <br> 
+            <br>
+            <style>
+            #mapid { height: 450px; }
+            </style>
+
+            <div id="mapid"></div>
+
+            
+            <script>
+            //Script for leaflet.js map
+            //initializing map
+            var mymap = L.map('mapid').setView([51.505, -0.09], 13);
+
+            //adding map tiles using OpenMap
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                  maxZoom: 25,
+                  attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
+            }).addTo(mymap);
+            L.control.scale().addTo(mymap);
+
+
+                  //using JS Geolocation API - checking if geolocation available on the device
+                  if ('geolocation' in navigator) {
+                     //geolocation is available
+                     console.log("geolocation available!");
+
+                     //retrieveing device's current position
+                     navigator.geolocation.getCurrentPosition(position => {
+                        console.log(position);
+                        console.log(position.coords.latitude);
+                        console.log(position.coords.longitude);
+
+                        const latitude = position.coords.latitude;
+                        const longitude = position.coords.longitude;
+                        
+
+                        document.getElementById('lat').textContent = latitude.toFixed(4);
+                        document.getElementById('lon').textContent = longitude.toFixed(4);
+
+                        //creating map marker using 
+                        let marker = L.marker([latitude, longitude]).addTo(mymap);
+                        mymap.setView([latitude, longitude],5);
+
+                        //Variable for storing user submitted data
+                        //let locationDataArray = [];
+                        //let locationData = {};
+
+                        
+                           //locationDataArray.push(locationData);
+                           
+                           
+
+                        
+
+                        //creating button + functionality for submitting User's location to the database
+                        let submitBtn =  document.getElementById("submitLocation");
+                        submitBtn.addEventListener("click", ()=>{
+                           let photoDescription = document.getElementById('photoDescription').value;
+                           let locationData = {latitude, longitude, photoDescription};
+                           console.log(photoDescription);
+                           console.log(locationData);
+                           const options = {
+                              method: 'POST', //this is a POST request - Client sending data to the server
+                              status:'success',
+                              headers: {
+                                 "Content-Type": 'application/json'
+                              },
+                              body: JSON.stringify(locationData)  //send the data as a string of text as a JSON string
+                           };
+                           
+                           //Receiving what was sent by the server
+                           fetch ('/api', options).then(response => {
+                              console.log(response);
+                           });
+                        });
+
+
+                     });
+
+                  } else {
+                     //geolocation is not available
+                     console.log("geolocation NOT available!");
+                  }
+
+                  
+
+                  
+            </script>
+
+            <br>
+
+           
+            <!--<input id="photoSubmitBtn" class="btn btn-primary" type="submit" value="Submit">-->
+
+            <!-- <script>
+               let photoSubmitBtn = document.getElementById('photoSubmitBtn');
+               photoSubmitBtn.addEventListener("click", ()=>{
+                  let description = document.getElementById("photoDescription").value;
+                  let photoDescription = {description};
+                  const options = {
+                              method: 'POST', //this is a POST request - Client sending data to the server
+                              status:'success',
+                              headers: {
+                                 "Content-Type": 'application/json'
+                              },
+                              body: JSON.stringify(photoDescription)  //send the data as a string of text as a JSON string
+                           };
+                           
+                           //Receiving what was sent by the server
+                           fetch ('/photo', options).then(response => {
+                              console.log(response);
+                           });
+               });
+            </script> -->
+
+
+
+         </div> 
+         <!--End of middle coloumn width 8 -->
+
+
+
+         <div class="col-md-2">.col-md-2</div>
+       </div>
+
+
+
+        <!--Bootstrap scripts, always leave right before end of body tag-->
+        <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+    </body>
+</html>
