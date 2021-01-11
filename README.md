@@ -1,5 +1,5 @@
 # Working-with-Data-and-APIs-Tutorial-CodingTrain-Module2
-Following CodingTrain's tutorial called "Working with Data and APIs in JS" that consist of 3 modules. This is the repo for the 2nd module that goes into depth of how to:
+This project is the result of me following CodingTrain's tutorial called "Working with Data and APIs in JS" that consist of 3 modules. This is the repo for the 2nd module that goes into depth of how to:
 
   [] Set up NeDB <br>
   [] POST and GET requests <br>
